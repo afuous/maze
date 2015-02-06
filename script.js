@@ -124,7 +124,7 @@ function startGame(maze) {
 		}
 		if(collide({x: x, y:y, radius: radius}, maze.end)) playing = false;
 
-		time++;
+		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40]) time++;
 	}
 	
 	function draw() {
@@ -145,7 +145,7 @@ function startGame(maze) {
 		ctx.fillStyle = "black";
 		ctx.textAlign = maze.score.align;
 		ctx.font = maze.score.font;
-		ctx.fillText(Math.floor(time / 100).toString(), maze.score.x, maze.score.y);
+		ctx.fillText((time / 100).toFixed(2).toString(), maze.score.x, maze.score.y);
 	}
 	
 	setInterval(function() {

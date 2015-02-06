@@ -10,8 +10,8 @@
 		"end" : "green"
 	},
 	"start" : {
-		"x" : 40,
-		"y" : 40
+		"x" : 50,
+		"y" : 50
 	},
 	"end" : {
 		"x" : 650,
@@ -23,8 +23,7 @@
 		"x" : 790,
 		"y" : 30,
 		"align" : "right",
-		"font" : "30px Arial",
-		"multiplier" : 100
+		"font" : "30px Arial"
 	},
 	"walls" : [
 		{
