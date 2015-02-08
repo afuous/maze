@@ -1,9 +1,11 @@
-{
+startGame({
 	"width" : 800,
 	"height" : 600,
 	"radius" : 20,
 	"accel" : 0.05,
 	"deaccel" : 0.1,
+	"border" : 10,
+	"friction" : 0,
 	"color" : {
 		"player" : "#ff6600",
 		"walls" : "black",
@@ -68,4 +70,4 @@
 			"height" : 500
 		}
 	]
-}
+});

@@ -1,3 +1,10 @@
+document.getElementById("loadDefault").onclick = function() {
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = "defaultMaze.js";
+	document.body.appendChild(script);
+};
+
 document.getElementById("loadFile").onclick = function() {
 	var file = document.getElementById("file").files[0];
 	if(file) {
@@ -35,15 +42,9 @@ function startGame(maze) {
 		height: 0
 	});
 	
-	document.getElementById("content").innerHTML = '<canvas id="canvas" style="border:2px solid black"></canvas>';
+	document.getElementById("content").innerHTML = "<canvas id='canvas' style='border:" + maze.border + "px solid " + maze.color.walls + ";'></canvas>";
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
-	
-	ctx.fillCircle = function(x, y, radius) {
-		ctx.beginPath();
-		ctx.arc(x, y, radius, 0, Math.PI * 2);
-		ctx.fill();
-	};
 	
 	canvas.width = maze.width;
 	canvas.height = maze.height;
@@ -86,17 +87,18 @@ function startGame(maze) {
 	var y = maze.start.y;
 	var dx = 0;
 	var dy = 0;
-	var accel = maze.accel;
-	var deaccel = maze.deaccel;
+	var accel = 0.05
+	var deaccel = 0.1;
+	var friction = 1 - maze.friction;
 	
 	var time = 0;
 	var playing = false;
 	
 	function physics() {
-		if(keys[37]) dx -= dx < 0 ? accel : deaccel;
-		if(keys[39]) dx += dx > 0 ? accel : deaccel;
-		if(keys[38]) dy -= dy < 0 ? accel : deaccel;
-		if(keys[40]) dy += dy > 0 ? accel : deaccel;
+		if(keys[37] || keys[65]) dx -= dx < 0 ? accel : deaccel;
+		if(keys[39] || keys[68]) dx += dx > 0 ? accel : deaccel;
+		if(keys[38] || keys[87]) dy -= dy < 0 ? accel : deaccel;
+		if(keys[40] || keys[83]) dy += dy > 0 ? accel : deaccel;
 		x += dx;
 		y += dy;
 		if(x < radius) {
@@ -115,6 +117,8 @@ function startGame(maze) {
 			y = canvas.height - radius;
 			dy = 0;
 		}
+		dx *= friction;
+		dy *= friction;
 		
 		for(var i = 0; i < maze.walls.length; i++) {
 			if(collide({x: x, y: y, radius: radius}, maze.walls[i])) {
@@ -124,7 +128,7 @@ function startGame(maze) {
 		}
 		if(collide({x: x, y:y, radius: radius}, maze.end)) playing = false;
 
-		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40]) time++;
+		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40] || keys[87] || keys[65] || keys[83] || keys[68]) time++;
 	}
 	
 	function draw() {
@@ -140,11 +144,13 @@ function startGame(maze) {
 		ctx.fillRect(maze.end.x, maze.end.y, maze.end.width, maze.end.height);
 		
 		ctx.fillStyle = maze.color.player;
-		ctx.fillCircle(x, y, radius);
+		ctx.beginPath();
+		ctx.arc(x, y, radius, 0, Math.PI * 2);
+		ctx.fill();
 		
 		ctx.fillStyle = "black";
 		ctx.textAlign = maze.score.align;
-		ctx.font = maze.score.font;
+		ctx.font = maze.score.font + "px Arial";
 		ctx.fillText((time / 100).toFixed(2).toString(), maze.score.x, maze.score.y);
 	}
 	
