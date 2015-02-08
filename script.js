@@ -1,8 +1,5 @@
 document.getElementById("loadDefault").onclick = function() {
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = "defaultMaze.js";
-	document.body.appendChild(script);
+	useMaze(defaultMaze);
 };
 
 document.getElementById("loadFile").onclick = function() {
@@ -10,42 +7,77 @@ document.getElementById("loadFile").onclick = function() {
 	if(file) {
 		var reader = new FileReader();
 		reader.onload = function() {
-			startGame(JSON.parse(reader.result));
+			try {
+				useMaze(JSON.parse(reader.result));
+			}
+			catch(e) {
+				useMaze(null);
+			}
 		};
 		reader.readAsText(file);
 	}
+};
+
+document.getElementById("loadURL").onclick = function() {
+	var url = document.getElementById("url").value;
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = "http://thevoidpigeon.heliohost.org/maze.php?url=" + escape(url);
+	document.body.appendChild(script);
+};
+
+function objMatch(a, b) {
+	if(typeof(a) != "object") return typeof(a) == typeof(b);
+	if(a == null || b == null) return false;
+	if(a instanceof Array) {
+		if(!(b instanceof Array)) return false;
+		for(var i = 0; i < b.length; i++) {
+			if(!objMatch(a[0], b[i])) return false;
+		}
+	}
+	else for(var key in a) {
+		if(!objMatch(a[key], b[key])) return false;
+	}
+	return true;
 }
 	
-function startGame(maze) {
-	maze.walls.push({
-		x: 0,
-		y: 0,
-		width: 0,
-		height: maze.height
-	});
-	maze.walls.push({
-		x: 0,
-		y: 0,
-		width: maze.width,
-		height: 0
-	});
-	maze.walls.push({
-		x: maze.width,
-		y: 0,
-		width: 0,
-		height: maze.height
-	});
-	maze.walls.push({
-		x: 0,
-		y: maze.height,
-		width: maze.width,
-		height: 0
-	});
+function useMaze(maze) {
+	if(!objMatch(defaultMaze, maze)) {
+		alert("invalid maze");
+		return;
+	}
 	
-	document.getElementById("content").innerHTML = "<canvas id='canvas' style='border:" + maze.border + "px solid " + maze.color.walls + ";'></canvas>";
+	maze.walls = maze.walls.concat([
+		{
+			x: 0,
+			y: 0,
+			width: 0,
+			height: maze.height
+		}, {
+			x: 0,
+			y: 0,
+			width: maze.width,
+			height: 0
+		}, {
+			x: maze.width,
+			y: 0,
+			width: 0,
+			height: maze.height
+		}, {
+			x: 0,
+			y: maze.height,
+			width: maze.width,
+			height: 0
+		}
+	]);
+	
+	document.getElementById("load").style.display = "none";
+	document.getElementById("game").style.display = "block";
+	
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 	
+	canvas.style.border = maze.border + "px solid " + maze.color.walls;
 	canvas.width = maze.width;
 	canvas.height = maze.height;
 	
@@ -53,14 +85,8 @@ function startGame(maze) {
 	window.onkeydown = function(event) {
 		var key = (event || window.event).keyCode;
 		keys[key] = true;
-		if(!playing && key == 32) {
-			radius = maze.radius;
-			x = maze.start.x;
-			y = maze.start.y;
-			dx = 0;
-			dy = 0;
-			time = 0;
-			playing = true;
+		if(!playing && (key == 32 || key == 16)) {
+			start();
 		}
 	};
 	window.onkeyup = function(event) {
@@ -82,17 +108,45 @@ function startGame(maze) {
 		return false;
 	}
 	
+	var x;
+	var y;
+	var dx;
+	var dy;
+	
 	var radius = maze.radius;
-	var x = maze.start.x;
-	var y = maze.start.y;
-	var dx = 0;
-	var dy = 0;
-	var accel = 0.05
-	var deaccel = 0.1;
+	var accel = maze.accel;
+	var deaccel = maze.deaccel;
 	var friction = 1 - maze.friction;
 	
-	var time = 0;
-	var playing = false;
+	var time;
+	var playing;
+	var interval;
+	
+	function start(beginning) {
+		x = maze.start.x;
+		y = maze.start.y;
+		dx = 0;
+		dy = 0;
+		time = 0;
+		if(beginning) {
+			playing = false;
+			draw();
+		}
+		else {
+			playing = true;
+			interval = setInterval(function() {
+				physics();
+				draw();
+			}, 10);
+		}
+	}
+	
+	function stop() {
+		playing = false;
+		clearInterval(interval);
+	}
+	
+	start(true);
 	
 	function physics() {
 		if(keys[37] || keys[65]) dx -= dx < 0 ? accel : deaccel;
@@ -122,11 +176,11 @@ function startGame(maze) {
 		
 		for(var i = 0; i < maze.walls.length; i++) {
 			if(collide({x: x, y: y, radius: radius}, maze.walls[i])) {
-				playing = false;
+				stop();
 				break;
 			}
 		}
-		if(collide({x: x, y:y, radius: radius}, maze.end)) playing = false;
+		if(collide({x: x, y:y, radius: radius}, maze.end)) stop();
 
 		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40] || keys[87] || keys[65] || keys[83] || keys[68]) time++;
 	}
@@ -153,9 +207,4 @@ function startGame(maze) {
 		ctx.font = maze.score.font + "px Arial";
 		ctx.fillText((time / 100).toFixed(2).toString(), maze.score.x, maze.score.y);
 	}
-	
-	setInterval(function() {
-		if(playing) physics();
-		draw();
-	}, 10);
 }

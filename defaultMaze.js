@@ -1,4 +1,4 @@
-startGame({
+var defaultMaze = {
 	"width" : 800,
 	"height" : 600,
 	"radius" : 20,
@@ -70,4 +70,4 @@ startGame({
 			"height" : 500
 		}
 	]
-});
+};

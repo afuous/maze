@@ -1,9 +1,159 @@
 <html>
 	<head>
 		<title> Hello </title>
+		<style type="text/css">
+			.header {
+				font-size: 20;
+				font-weight: bold;
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 	<body>
 		<canvas id="canvas"></canvas>
+		<table cellpadding="10">
+			<tr>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header"> General: </td>
+						</tr>
+						<tr>
+							<td> Thickness: </td>
+							<td> <input type="number" value="10" min="1" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Width: </td>
+							<td> <input type="number" value="800" min="1"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Height: </td>
+							<td> <input type="number" value="600" min="1"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header"> Player: </td>
+						</tr>
+						<tr>
+							<td> Radius: </td>
+							<td> <input type="number" value="20" min="1" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Acceleration: </td>
+							<td> <input type="number" value="0.05" min="0" step="0.01" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Deceleration: </td>
+							<td> <input type="number" value="0.1" min="0" step=="0.01" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Friction: </td>
+							<td> <input type="number" value="0" min="0" max="1" step="0.001" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Starting X: </td>
+							<td> <input type="number" value="50" min="20" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Starting Y: </td>
+							<td> <input type="number" value="50" min="20" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header"> Colors: </td>
+						</tr>
+						<tr>
+							<td> Player: </td>
+							<td> <input type="text" value="blue" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Walls: </td>
+							<td> <input type="text" value="black" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Win Zone: </td>
+							<td> <input type="text" value="green" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header"> Win Zone: </td>
+						</tr>
+						<tr>
+							<td> X: </td>
+							<td> <input type="number" value="650" min="0" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Y: </td>
+							<td> <input type="number" value="550" min="0"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Width: </td>
+							<td> <input type="number" value="150" min="1"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Height: </td>
+							<td> <input type="number" value="50" min="1"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header"> Score: </td>
+						</tr>
+						<tr>
+							<td> X: </td>
+							<td> <input type="number" value="790" min="0" /> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Y: </td>
+							<td> <input type="number" value="30" min="0"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Align: </td>
+							<td> <select>
+								<option> left </option>
+								<option> center </option>
+								<option selected> right </option>
+							</select </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+						<tr>
+							<td> Font: </td>
+							<td> <input type="number" value="30" min="1"/> </td>
+							<td> <input type="button" value="Change" /> </td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
 		<script type="text/javascript" src="editor.js"></script>
 	</body>
 </html>

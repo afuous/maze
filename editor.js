@@ -71,6 +71,7 @@ var maze = {
 
 var selected = null;
 
+/*
 var border = getInput("number", maze.border);
 getDiv("Border:<br>", border, getButton("Edit", border, function(border) {
 	maze.border = parseInt(border);
@@ -78,6 +79,7 @@ getDiv("Border:<br>", border, getButton("Edit", border, function(border) {
 		if(inputs[i].modifyStep) inputs[i].step = maze.border;
 	}
 })).add();
+*/
 
 var width = getInput("number", maze.width, 1);
 

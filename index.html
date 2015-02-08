@@ -11,15 +11,30 @@
 				user-select: none;
 			}
 		</style>
+		<script type="text/javascript" src="defaultMaze.js"></script>
 	</head>
 	<body>
 		<table width="100%" height="100%">
 			<tr>
-				<td align="center" valign="middle" id="content">
-					<input type="button" value="Default Maze" id="loadDefault" />
-					<br><br>
-					<input type="button" value="Load Maze" id="loadFile" />
-					<input type="file" id="file" />
+				<td align="center" valign="middle">
+					<div id="load" style="display:block;">
+						<table cellpadding="10">
+							<tr><td>
+								<input type="button" value="Default Maze" id="loadDefault" />
+							</td></tr>
+							<tr><td>
+								<input type="button" value="Load Maze" id="loadFile" />
+								<input type="file" id="file" />
+							</td></tr>
+							<tr><td>
+								<input type="button" value="Load Maze" id="loadURL" />
+								<input type="text" style="width:300;" id="url" />
+							</td></tr>
+						</table>
+					</div>
+					<div id="game" style="display:none;">
+						<canvas id="canvas"></canvas>
+					</div>
 				</td>
 			</tr>
 		</table>
