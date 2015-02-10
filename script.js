@@ -40,7 +40,7 @@ function objMatch(a, b) {
 	}
 	return true;
 }
-	
+
 function useMaze(maze) {
 	if(!objMatch(defaultMaze, maze)) {
 		alert("invalid maze");

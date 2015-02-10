@@ -1,4 +1,4 @@
-var defaultMaze = {
+defaultMaze = {
 	"width" : 800,
 	"height" : 600,
 	"radius" : 20,
@@ -25,7 +25,7 @@ var defaultMaze = {
 		"x" : 790,
 		"y" : 30,
 		"align" : "right",
-		"font" : "30px Arial"
+		"font" : 30
 	},
 	"walls" : [
 		{

@@ -6,8 +6,11 @@
 				font-size: 20;
 				font-weight: bold;
 				text-decoration: underline;
+				text-align: center;
 			}
 		</style>
+		<script type="text/javascript" src="defaultMaze.js"></script>
+		<script type="text/javascript" src="blankMaze.js"></script>
 	</head>
 	<body>
 		<canvas id="canvas"></canvas>
@@ -16,139 +19,160 @@
 				<td valign="top">
 					<table>
 						<tr>
-							<td class="header"> General: </td>
+							<td class="header" colspan="2"> General: </td>
 						</tr>
 						<tr>
-							<td> Thickness: </td>
-							<td> <input type="number" value="10" min="1" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Border: </td>
+							<td> <input id="border" type="number" min="0" /> </td>
 						</tr>
 						<tr>
-							<td> Width: </td>
-							<td> <input type="number" value="800" min="1"/> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Width: </td>
+							<td> <input id="width" type="number" min="1" /> </td>
 						</tr>
 						<tr>
-							<td> Height: </td>
-							<td> <input type="number" value="600" min="1"/> </td>
-							<td> <input type="button" value="Change" /> </td>
-						</tr>
-					</table>
-				</td>
-				<td valign="top">
-					<table>
-						<tr>
-							<td class="header"> Player: </td>
+							<td align="right"> Height: </td>
+							<td> <input id="height" type="number" min="1" /> </td>
 						</tr>
 						<tr>
-							<td> Radius: </td>
-							<td> <input type="number" value="20" min="1" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td colspan="2" align="right"> <input id="vertical" type="button" value="Add vertical wall" /> </td>
 						</tr>
 						<tr>
-							<td> Acceleration: </td>
-							<td> <input type="number" value="0.05" min="0" step="0.01" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td colspan="2" align="right"> <input id="horizontal" type="button" value="Add horizontal wall" /> </td>
 						</tr>
 						<tr>
-							<td> Deceleration: </td>
-							<td> <input type="number" value="0.1" min="0" step=="0.01" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td colspan="2" align="right"> <input id="blank" type="button" value="Load blank maze" /> </td>
 						</tr>
 						<tr>
-							<td> Friction: </td>
-							<td> <input type="number" value="0" min="0" max="1" step="0.001" /> </td>
-							<td> <input type="button" value="Change" /> </td>
-						</tr>
-						<tr>
-							<td> Starting X: </td>
-							<td> <input type="number" value="50" min="20" /> </td>
-							<td> <input type="button" value="Change" /> </td>
-						</tr>
-						<tr>
-							<td> Starting Y: </td>
-							<td> <input type="number" value="50" min="20" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td colspan="2" align="right"> <input id="json" type="button" value="Get JSON" /> </td>
 						</tr>
 					</table>
 				</td>
 				<td valign="top">
 					<table>
 						<tr>
-							<td class="header"> Colors: </td>
+							<td class="header" colspan="2"> Player: </td>
 						</tr>
 						<tr>
-							<td> Player: </td>
-							<td> <input type="text" value="blue" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Radius: </td>
+							<td> <input id="radius" type="number" min="1" /> </td>
 						</tr>
 						<tr>
-							<td> Walls: </td>
-							<td> <input type="text" value="black" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Acceleration: </td>
+							<td> <input id="accel" type="number" min="0" step="0.01" /> </td>
 						</tr>
 						<tr>
-							<td> Win Zone: </td>
-							<td> <input type="text" value="green" /> </td>
-							<td> <input type="button" value="Change" /> </td>
-						</tr>
-					</table>
-				</td>
-				<td valign="top">
-					<table>
-						<tr>
-							<td class="header"> Win Zone: </td>
+							<td align="right"> Deceleration: </td>
+							<td> <input id="deaccel" type="number" min="0" step=="0.01" /> </td>
 						</tr>
 						<tr>
-							<td> X: </td>
-							<td> <input type="number" value="650" min="0" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Friction: </td>
+							<td> <input id="friction" type="number" min="0" max="1" step="0.001" /> </td>
 						</tr>
 						<tr>
-							<td> Y: </td>
-							<td> <input type="number" value="550" min="0"/> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Starting X: </td>
+							<td> <input id="startX" type="number" min="20" /> </td>
 						</tr>
 						<tr>
-							<td> Width: </td>
-							<td> <input type="number" value="150" min="1"/> </td>
-							<td> <input type="button" value="Change" /> </td>
-						</tr>
-						<tr>
-							<td> Height: </td>
-							<td> <input type="number" value="50" min="1"/> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Starting Y: </td>
+							<td> <input id="startY" type="number" min="20" /> </td>
 						</tr>
 					</table>
 				</td>
 				<td valign="top">
 					<table>
 						<tr>
-							<td class="header"> Score: </td>
+							<td class="header" colspan="2"> Colors: </td>
 						</tr>
 						<tr>
-							<td> X: </td>
-							<td> <input type="number" value="790" min="0" /> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Player: </td>
+							<td> <input id="playerColor" type="text" /> </td>
 						</tr>
 						<tr>
-							<td> Y: </td>
-							<td> <input type="number" value="30" min="0"/> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Walls: </td>
+							<td> <input id="wallColor" type="text" /> </td>
 						</tr>
 						<tr>
-							<td> Align: </td>
-							<td> <select>
+							<td align="right"> Win Zone: </td>
+							<td> <input id="endColor" type="text" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header" colspan="2"> Win Zone: </td>
+						</tr>
+						<tr>
+							<td align="right"> X: </td>
+							<td> <input id="endX" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Y: </td>
+							<td> <input id="endY" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Width: </td>
+							<td> <input id="endWidth" type="number" min="1" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Height: </td>
+							<td> <input id="endHeight" type="number" min="1" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top">
+					<table>
+						<tr>
+							<td class="header" colspan="2"> Score: </td>
+						</tr>
+						<tr>
+							<td align="right"> X: </td>
+							<td> <input id="scoreX" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Y: </td>
+							<td> <input id="scoreY" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Alignment: </td>
+							<td> <select id="scoreAlign">
 								<option> left </option>
 								<option> center </option>
 								<option selected> right </option>
-							</select </td>
-							<td> <input type="button" value="Change" /> </td>
+							</select> </td>
 						</tr>
 						<tr>
-							<td> Font: </td>
-							<td> <input type="number" value="30" min="1"/> </td>
-							<td> <input type="button" value="Change" /> </td>
+							<td align="right"> Font Size: </td>
+							<td> <input id="scoreFont" type="number" min="1" /> </td>
+						</tr>
+					</table>
+				</td>
+				<td valign="top" id="selected" style="display:none;">
+					<table>
+						<tr>
+							<td class="header" colspan="2"> Selected Wall: </td>
+						</tr>
+						<tr>
+							<td align="right"> X: </td>
+							<td> <input id="wallX" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Y: </td>
+							<td> <input id="wallY" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Width: </td>
+							<td> <input id="wallWidth" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td align="right"> Height: </td>
+							<td> <input id="wallHeight" type="number" min="0" /> </td>
+						</tr>
+						<tr>
+							<td colspan="2" align="right"> <input id="remove" type="button" value="Remove" /> </td>
+						</tr>
+						<tr>
+							<td colspan="2" align="right"> <input id="done" type="button" value="Done" /> </td>
 						</tr>
 					</table>
 				</td>
