@@ -33,7 +33,7 @@ assignInputs();
 
 for(var id in inputs) {
 	dgid(id).onchange = dgid(id).onkeyup = function() {
-		inputs[this.id][0][inputs[this.id][1]] = this.type == "number" ? parseInt(this.value) : this.value.split(" ").join("");
+		inputs[this.id][0][inputs[this.id][1]] = this.type == "number" ? parseFloat(this.value) : this.value.split(" ").join("");
 		draw();
 	};
 }
