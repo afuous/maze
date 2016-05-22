@@ -149,10 +149,10 @@ function useMaze(maze) {
 	start(true);
 	
 	function physics() {
-		if(keys[37] || keys[65]) dx -= dx < 0 ? accel : deaccel;
-		if(keys[39] || keys[68]) dx += dx > 0 ? accel : deaccel;
-		if(keys[38] || keys[87]) dy -= dy < 0 ? accel : deaccel;
-		if(keys[40] || keys[83]) dy += dy > 0 ? accel : deaccel;
+		if(keys[37] || keys[65] || keys[72]) dx -= dx < 0 ? accel : deaccel;
+		if(keys[39] || keys[68] || keys[76]) dx += dx > 0 ? accel : deaccel;
+		if(keys[38] || keys[87] || keys[75]) dy -= dy < 0 ? accel : deaccel;
+		if(keys[40] || keys[83] || keys[74]) dy += dy > 0 ? accel : deaccel;
 		x += dx;
 		y += dy;
 		if(x < radius) {
@@ -182,7 +182,8 @@ function useMaze(maze) {
 		}
 		if(collide({x: x, y:y, radius: radius}, maze.end)) stop();
 
-		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40] || keys[87] || keys[65] || keys[83] || keys[68]) time++;
+		// I do not feel like fixing this
+		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40] || keys[87] || keys[65] || keys[83] || keys[68] || keys[72] || keys[74] || keys[75] || keys[76]) time++;
 	}
 	
 	function draw() {
