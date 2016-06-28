@@ -41,6 +41,29 @@ function objMatch(a, b) {
 	return true;
 }
 
+Array.prototype.some = function(func) {
+	if(!func) {
+		func = function(a) {
+			return a;
+		};
+	}
+	for(var i = 0; i < this.length; i++) {
+		if(func(this[i])) {
+			return true;
+		}
+	}
+	return false;
+};
+
+Array.prototype.contains = function(elem) {
+	for(var i = 0; i < this.length; i++) {
+		if(this[i] == elem) {
+			return true;
+		}
+	}
+	return false;
+};
+
 function useMaze(maze) {
 	if(!objMatch(defaultMaze, maze)) {
 		alert("invalid maze");
@@ -70,6 +93,22 @@ function useMaze(maze) {
 			height: 0
 		}
 	]);
+
+	var controls = {
+		movement: {
+			// arrows, wasd, vim
+			left: [37, "A".charCodeAt(), "H".charCodeAt()],
+			right: [39, "D".charCodeAt(), "L".charCodeAt()],
+			up: [38, "W".charCodeAt(), "K".charCodeAt()],
+			down: [40, "S".charCodeAt(), "J".charCodeAt()]
+		},
+		restart: [32, 16] // space, shift
+	};
+	function anyKeyDown(dir) {
+		return controls.movement[dir].some(function(key) {
+			return keys[key];
+		});
+	}
 	
 	document.getElementById("load").style.display = "none";
 	document.getElementById("game").style.display = "block";
@@ -85,7 +124,7 @@ function useMaze(maze) {
 	window.onkeydown = function(event) {
 		var key = (event || window.event).keyCode;
 		keys[key] = true;
-		if(!playing && (key == 32 || key == 16)) {
+		if(!playing && controls.restart.contains(key)) {
 			start();
 		}
 	};
@@ -143,10 +182,10 @@ function useMaze(maze) {
 	start();
 	
 	function physics() {
-		if(keys[37] || keys[65] || keys[72]) dx -= dx < 0 ? accel : deaccel;
-		if(keys[39] || keys[68] || keys[76]) dx += dx > 0 ? accel : deaccel;
-		if(keys[38] || keys[87] || keys[75]) dy -= dy < 0 ? accel : deaccel;
-		if(keys[40] || keys[83] || keys[74]) dy += dy > 0 ? accel : deaccel;
+		if(anyKeyDown("left")) dx -= dx < 0 ? accel : deaccel;
+		if(anyKeyDown("right")) dx += dx > 0 ? accel : deaccel;
+		if(anyKeyDown("up")) dy -= dy < 0 ? accel : deaccel;
+		if(anyKeyDown("down")) dy += dy > 0 ? accel : deaccel;
 		x += dx;
 		y += dy;
 		if(x < radius) {
@@ -176,8 +215,7 @@ function useMaze(maze) {
 		}
 		if(collide({x: x, y:y, radius: radius}, maze.end)) stop();
 
-		// I do not feel like fixing this
-		if(time > 0 || keys[37] || keys[38] || keys[39] || keys[40] || keys[87] || keys[65] || keys[83] || keys[68] || keys[72] || keys[74] || keys[75] || keys[76]) time++;
+		if(time > 0 || anyKeyDown("left") || anyKeyDown("right") || anyKeyDown("up") || anyKeyDown("down")) time++;
 	}
 	
 	function draw() {
