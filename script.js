@@ -122,23 +122,17 @@ function useMaze(maze) {
 	var playing;
 	var interval;
 	
-	function start(beginning) {
+	function start() {
 		x = maze.start.x;
 		y = maze.start.y;
 		dx = 0;
 		dy = 0;
 		time = 0;
-		if(beginning) {
-			playing = false;
+		playing = true;
+		interval = setInterval(function() {
+			physics();
 			draw();
-		}
-		else {
-			playing = true;
-			interval = setInterval(function() {
-				physics();
-				draw();
-			}, 10);
-		}
+		}, 10);
 	}
 	
 	function stop() {
@@ -146,7 +140,7 @@ function useMaze(maze) {
 		clearInterval(interval);
 	}
 	
-	start(true);
+	start();
 	
 	function physics() {
 		if(keys[37] || keys[65] || keys[72]) dx -= dx < 0 ? accel : deaccel;
