@@ -160,7 +160,7 @@ function useMaze(maze) {
 	var time;
 	var playing;
 	var interval;
-	
+
 	function start() {
 		x = maze.start.x;
 		y = maze.start.y;
@@ -168,12 +168,16 @@ function useMaze(maze) {
 		dy = 0;
 		time = 0;
 		playing = true;
+		var lastUpdate = Date.now();
 		interval = setInterval(function() {
-			physics();
+			while (Date.now() - lastUpdate > 10) {
+				physics();
+				lastUpdate += 10;
+			}
 			draw();
-		}, 10);
+		}, 1000 / 60);
 	}
-	
+
 	function stop() {
 		playing = false;
 		clearInterval(interval);
