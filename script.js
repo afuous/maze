@@ -69,7 +69,7 @@ function useMaze(maze) {
 		alert("invalid maze");
 		return;
 	}
-	
+
 	maze.walls = maze.walls.concat([
 		{
 			x: 0,
@@ -102,29 +102,30 @@ function useMaze(maze) {
 			up: [38, "W".charCodeAt(), "K".charCodeAt()],
 			down: [40, "S".charCodeAt(), "J".charCodeAt()]
 		},
-		restart: [32, 16] // space, shift
+		restartWin: [32], // space
+		restartLose: [32, 16] // space, shift
 	};
 	function anyKeyDown(dir) {
 		return controls.movement[dir].some(function(key) {
 			return keys[key];
 		});
 	}
-	
+
 	document.getElementById("load").style.display = "none";
 	document.getElementById("game").style.display = "block";
-	
+
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
-	
+
 	canvas.style.border = maze.border + "px solid " + maze.color.walls;
 	canvas.width = maze.width;
 	canvas.height = maze.height;
-	
+
 	var keys = {};
 	window.onkeydown = function(event) {
 		var key = (event || window.event).keyCode;
 		keys[key] = true;
-		if(!playing && controls.restart.contains(key)) {
+		if(!playing && (didWin ? controls.restartWin : controls.restartLose).contains(key)) {
 			start();
 		}
 	};
@@ -132,11 +133,11 @@ function useMaze(maze) {
 		var key = (event || window.event).keyCode;
 		keys[key] = false;
 	};
-	
+
 	function dist(a, b) {
 		return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 	}
-	
+
 	function collide(ball, rect) {
 		if(ball.x + ball.radius >= rect.x && ball.x - ball.radius <= rect.x + rect.width && ball.y >= rect.y && ball.y <= rect.y + rect.height) return true;
 		if(ball.x >= rect.x && ball.x <= rect.x + rect.width && ball.y + ball.radius >= rect.y && ball.y - ball.radius <= rect.y + rect.height) return true;
@@ -146,19 +147,20 @@ function useMaze(maze) {
 		if(dist(ball, {x: rect.x + rect.width, y: rect.y + rect.height}) < ball.radius) return true;
 		return false;
 	}
-	
+
 	var x;
 	var y;
 	var dx;
 	var dy;
-	
+
 	var radius = maze.radius;
 	var accel = maze.accel;
 	var deaccel = maze.deaccel;
 	var friction = 1 - maze.friction;
-	
+
 	var time;
 	var playing;
+	var didWin;
 	var interval;
 
 	function start() {
@@ -182,9 +184,9 @@ function useMaze(maze) {
 		playing = false;
 		clearInterval(interval);
 	}
-	
+
 	start();
-	
+
 	function physics() {
 		if(anyKeyDown("left")) dx -= dx < 0 ? accel : deaccel;
 		if(anyKeyDown("right")) dx += dx > 0 ? accel : deaccel;
@@ -210,35 +212,39 @@ function useMaze(maze) {
 		}
 		dx *= friction;
 		dy *= friction;
-		
+
 		for(var i = 0; i < maze.walls.length; i++) {
 			if(collide({x: x, y: y, radius: radius}, maze.walls[i])) {
+				didWin = false;
 				stop();
 				break;
 			}
 		}
-		if(collide({x: x, y:y, radius: radius}, maze.end)) stop();
+		if(collide({x: x, y:y, radius: radius}, maze.end)) {
+			didWin = true;
+			stop();
+		}
 
 		if(time > 0 || anyKeyDown("left") || anyKeyDown("right") || anyKeyDown("up") || anyKeyDown("down")) time++;
 	}
-	
+
 	function draw() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		
+
 		ctx.fillStyle = maze.color.walls;
 		for(var i = 0; i < maze.walls.length; i++) {
 			var wall = maze.walls[i];
 			ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
 		}
-		
+
 		ctx.fillStyle = maze.color.end;
 		ctx.fillRect(maze.end.x, maze.end.y, maze.end.width, maze.end.height);
-		
+
 		ctx.fillStyle = maze.color.player;
 		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
 		ctx.fill();
-		
+
 		ctx.fillStyle = "black";
 		ctx.textAlign = maze.score.align;
 		ctx.font = maze.score.font + "px Arial";
