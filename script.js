@@ -163,6 +163,8 @@ function useMaze(maze) {
 	var didWin;
 	var interval;
 
+	var locations;
+
 	function start() {
 		x = maze.start.x;
 		y = maze.start.y;
@@ -172,20 +174,34 @@ function useMaze(maze) {
 		playing = true;
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
+			locations.push({
+				x: x,
+				y: y,
+			});
 			while (Date.now() - lastUpdate > 10) {
 				physics();
 				lastUpdate += 10;
 			}
 			draw();
 		}, 1000 / 60);
+		locations = [];
+		document.getElementById("showPath").style.visibility = "hidden";
 	}
 
 	function stop() {
 		playing = false;
 		clearInterval(interval);
+		document.getElementById("showPath").style.visibility = "visible";
 	}
 
 	start();
+
+	// should add hide path button
+	document.getElementById("showPath").onclick = function() {
+		for (var i = 0; i < locations.length; i++) {
+			drawPlayer(locations[i].x, locations[i].y);
+		}
+	};
 
 	function physics() {
 		if(anyKeyDown("left")) dx -= dx < 0 ? accel : deaccel;
@@ -228,6 +244,13 @@ function useMaze(maze) {
 		if(time > 0 || anyKeyDown("left") || anyKeyDown("right") || anyKeyDown("up") || anyKeyDown("down")) time++;
 	}
 
+	function drawPlayer(xPos, yPos) {
+		ctx.fillStyle = maze.color.player;
+		ctx.beginPath();
+		ctx.arc(xPos, yPos, radius, 0, Math.PI * 2);
+		ctx.fill();
+	}
+
 	function draw() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -240,10 +263,7 @@ function useMaze(maze) {
 		ctx.fillStyle = maze.color.end;
 		ctx.fillRect(maze.end.x, maze.end.y, maze.end.width, maze.end.height);
 
-		ctx.fillStyle = maze.color.player;
-		ctx.beginPath();
-		ctx.arc(x, y, radius, 0, Math.PI * 2);
-		ctx.fill();
+		drawPlayer(x, y);
 
 		ctx.fillStyle = "black";
 		ctx.textAlign = maze.score.align;
