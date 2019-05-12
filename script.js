@@ -174,11 +174,11 @@ function useMaze(maze) {
 		playing = true;
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
-			locations.push({
-				x: x,
-				y: y,
-			});
 			while (Date.now() - lastUpdate > 10) {
+				locations.push({
+					x: x,
+					y: y,
+				});
 				physics();
 				lastUpdate += 10;
 			}
