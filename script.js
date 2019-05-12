@@ -175,12 +175,12 @@ function useMaze(maze) {
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
 			while (Date.now() - lastUpdate > 10) {
+				physics();
+				lastUpdate += 10;
 				locations.push({
 					x: x,
 					y: y,
 				});
-				physics();
-				lastUpdate += 10;
 			}
 			draw();
 		}, 1000 / 60);
