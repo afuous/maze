@@ -8,7 +8,8 @@ document.getElementById("loadFile").onclick = function() {
 		var reader = new FileReader();
 		reader.onload = function() {
 			try {
-				useMaze(JSON.parse(reader.result));
+				var json = reader.result.substring(reader.result.indexOf("{"));
+				useMaze(JSON.parse(json));
 			}
 			catch(e) {
 				useMaze(null);
@@ -22,9 +23,23 @@ document.getElementById("loadURL").onclick = function() {
 	var url = document.getElementById("url").value;
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "http://thevoidpigeon.heliohost.org/maze.php?url=" + escape(url);
+	script.src = url;
 	document.body.appendChild(script);
+	script.onload = function() {
+		useMaze(loadedMaze);
+	};
 };
+
+document.getElementById("loadPrebuilt").onclick = function() {
+	var name = document.getElementById("prebuilt").value;
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = "mazes/" + name + ".js";
+	document.body.appendChild(script);
+	script.onload = function() {
+		useMaze(loadedMaze);
+	};
+}
 
 function objMatch(a, b) {
 	if(typeof(a) != "object") return typeof(a) == typeof(b);

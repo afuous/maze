@@ -63,8 +63,8 @@ dgid("blank").onclick = function() {
 	loadMaze();
 };
 
-dgid("json").onclick = function() {
-	prompt("", JSON.stringify(maze));
+dgid("jsonp").onclick = function() {
+	prompt("", "loadedMaze=" + JSON.stringify(maze));
 };
 
 var canvas = document.getElementById("canvas");
