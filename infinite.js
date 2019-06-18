@@ -43,8 +43,6 @@ Array.prototype.contains = function(elem) {
 
 	canvas.width = document.body.clientWidth;
 	canvas.height = document.body.clientHeight;
-	// canvas.width = 1900;
-	// canvas.height = 900;
 
 	var keys = {};
 	window.onkeydown = function(event) {
@@ -91,7 +89,8 @@ Array.prototype.contains = function(elem) {
 	var locations;
 
 	var wallThickness = 10;
-	var tunnelWidth = 100;
+	// var tunnelWidth = 100;
+	var tunnelWidth = 150;
 	var startOffset = 50;
 
 	var RIGHT = 0;
@@ -351,7 +350,8 @@ Array.prototype.contains = function(elem) {
 			}
 
 			var turnType;
-			if (Math.random() < 0.7) {
+			// if (Math.random() < 0.7) {
+			if (Math.random() < 1) {
 				if (Math.random() < 0.5) {
 					turnType = TURN_LEFT;
 				} else {
