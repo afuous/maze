@@ -421,11 +421,15 @@ Array.prototype.contains = function(elem) {
 			draw();
 		}, 1000 / 60);
 		locations = [];
+
+		window.originalCursor = document.body.style.cursor;
+		document.body.style.cursor = "none";
 	}
 
 	function stop() {
 		playing = false;
 		clearInterval(interval);
+		document.body.style.cursor = window.originalCursor;
 	}
 
 	start();
