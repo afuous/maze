@@ -31,6 +31,10 @@ Array.prototype.contains = function(elem) {
 			down: [40, "S".charCodeAt()],
 		},
 		restart: [32], // space
+		zoom: {
+			in: 187,
+			out: 189,
+		},
 	};
 	function anyKeyDown(dir) {
 		return controls.movement[dir].some(function(key) {
@@ -50,6 +54,12 @@ Array.prototype.contains = function(elem) {
 		keys[key] = true;
 		if (!playing && controls.restart.contains(key)) {
 			start();
+		}
+		if (controls.zoom.in == key) {
+			scale += 0.1;
+		}
+		if (controls.zoom.out == key) {
+			scale = Math.max(0.1, scale - 0.1);
 		}
 	};
 	window.onkeyup = function(event) {
@@ -308,10 +318,10 @@ Array.prototype.contains = function(elem) {
 	function isTunnelValid(tunnel) {
 		// to check if two tunnels collide, it suffices to check if any of their walls collide
 		// should check for overlapping passages here instead
-		var newWalls = getWallsForTunnel(tunnel);
-		for (var i = 0; i < walls.length - getWallsForTunnel(tunnels[tunnels.length - 1]).length; i++) {
-			for (var j = 0; j < newWalls.length; j++) {
-				if (collideRectRect(walls[i], newWalls[j])) {
+		var newPassages = getPassagesForTunnel(tunnel);
+		for (var i = 0; i < passages.length - getPassagesForTunnel(tunnels[tunnels.length - 1]).length; i++) {
+			for (var j = 0; j < newPassages.length; j++) {
+				if (collideRectRect(passages[i], newPassages[j])) {
 					return false;
 				}
 			}
@@ -514,19 +524,21 @@ Array.prototype.contains = function(elem) {
 		if (time > 0 || anyKeyDown("left") || anyKeyDown("right") || anyKeyDown("up") || anyKeyDown("down")) time++;
 	}
 
-	function drawRect(x, y, width, height) {
-		var offsetX = canvas.width / 2 - player.x;
-		var offsetY = canvas.height / 2 - player.y;
+	var scale = 1;
 
-		ctx.fillRect(x + offsetX, y + offsetY, width, height);
+	function drawRect(x, y, width, height) {
+		var offsetX = canvas.width / 2 - player.x * scale;
+		var offsetY = canvas.height / 2 - player.y * scale;
+
+		ctx.fillRect(x * scale + offsetX, y * scale + offsetY, width * scale, height * scale);
 	}
 
 	function drawCircle(x, y, radius) {
-		var offsetX = canvas.width / 2 - player.x;
-		var offsetY = canvas.height / 2 - player.y;
+		var offsetX = canvas.width / 2 - player.x * scale;
+		var offsetY = canvas.height / 2 - player.y * scale;
 
 		ctx.beginPath();
-		ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
+		ctx.arc(x * scale + offsetX, y * scale + offsetY, radius * scale, 0, Math.PI * 2);
 		ctx.fill();
 	}
 
