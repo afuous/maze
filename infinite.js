@@ -91,6 +91,7 @@ Array.prototype.contains = function(elem) {
 	var wallThickness = 10;
 	// var tunnelWidth = 100;
 	var tunnelWidth = 150;
+	// var tunnelWidth = 90 + Math.floor(Math.random() * 70);
 	var startOffset = 50;
 
 	var RIGHT = 0;
@@ -109,30 +110,38 @@ Array.prototype.contains = function(elem) {
 	var walls; // this is the actual wall drawn on the screen
 	var passages; // a passage is just the rectangular space occupied along with direction, including the walls themselves, and with overlap
 
+	// tunnel dir is the dir coming into the tunnel, not going out
+
 	// obj has the form { x, y, dir }
 	function toRefDir(refDir, obj) {
 		// this is very weird for UP and DOWN since the y coordinate on computers is flipped
+		var result;
 		if (refDir == RIGHT) {
 			return obj;
 		} else if (refDir == LEFT) {
-			return {
+			result = {
 				x: -obj.x,
 				y: -obj.y,
 				dir: (obj.dir + 2) % 4,
 			};
 		} else if (refDir == UP) {
-			return {
+			result = {
 				x: -obj.y,
 				y: obj.x,
 				dir: (obj.dir + 3) % 4,
 			};
 		} else if (refDir == DOWN) {
-			return {
+			result = {
 				x: obj.y,
 				y: -obj.x,
 				dir: (obj.dir + 1) % 4,
 			};
 		}
+		if ("length" in obj) {
+			// for passages
+			result.length = obj.length;
+		}
+		return result;
 	}
 
 	function fromRefDir(refDir, obj) {
@@ -259,10 +268,41 @@ Array.prototype.contains = function(elem) {
 	}
 
 	function addTunnel(tunnel) {
-		console.log(tunnel)
 		addWallsForTunnel(tunnel);
 		addPassagesForTunnel(tunnel);
 		tunnels.push(tunnel);
+	}
+
+	function getRectForPassage(passage) {
+		if (passage.dir == RIGHT) {
+			return {
+				x: passage.x,
+				y: passage.y - tunnelWidth / 2 - wallThickness,
+				width: passage.length,
+				height: tunnelWidth + wallThickness * 2,
+			};
+		} else if (passage.dir == LEFT) {
+			return {
+				x: passage.x - passage.length,
+				y: passage.y - tunnelWidth / 2 - wallThickness,
+				width: passage.length,
+				height: tunnelWidth + wallThickness * 2,
+			};
+		} else if (passage.dir == DOWN) {
+			return {
+				x: passage.x - tunnelWidth / 2 - wallThickness,
+				y: passage.y,
+				width: tunnelWidth + wallThickness * 2,
+				height: passage.length,
+			};
+		} else if (passage.dir == UP) {
+			return {
+				x: passage.x - tunnelWidth / 2 - wallThickness,
+				y: passage.y - passage.length,
+				width: tunnelWidth + wallThickness * 2,
+				height: passage.length,
+			};
+		}
 	}
 
 	function isTunnelValid(tunnel) {
@@ -276,6 +316,25 @@ Array.prototype.contains = function(elem) {
 				}
 			}
 		}
+
+		var newPassages = getPassagesForTunnel(tunnel);
+		var lastNewPassage = newPassages[newPassages.length - 1];
+		var refDir = lastNewPassage.dir;
+		rotated = toRefDir(refDir, lastNewPassage); // always facing right
+		for (var i = 0; i < passages.length - getPassagesForTunnel(tunnels[tunnels.length - 1]).length; i++) {
+			var otherRotated = toRefDir(refDir, passages[i]);
+			var rect = getRectForPassage(otherRotated);
+
+			// deal with rotated and rect
+			if (rotated.x < rect.x + rect.width
+				&& rotated.x + rotated.length + tunnelWidth + wallThickness > rect.x
+				&& rotated.y - tunnelWidth / 2 - wallThickness < rect.y + rect.height
+				&& rotated.y + tunnelWidth / 2 + wallThickness > rect.y
+			) {
+				return false;
+			}
+		}
+
 		return true;
 
 		var minDistance = tunnelWidth * 2 + wallThickness * 4; // min distance between parallel passages
@@ -333,14 +392,14 @@ Array.prototype.contains = function(elem) {
 		return fromRefDir(refDir, result);
 	}
 
-	a=0
+	ended = false;
 	function generateTunnels(minX, minY, maxX, maxY) {
 		var attempts = 0;
 		while (true) {
-			if(a>100)return
 			attempts++;
-			if (attempts > 100) {
+			if (ended || attempts > 1000) {
 				console.log("infinite loop");
+				ended = true;
 				break;
 			}
 
@@ -378,7 +437,6 @@ Array.prototype.contains = function(elem) {
 				length: length,
 			};
 			if (isTunnelValid(tunnel)) {
-				a++
 				addTunnel(tunnel);
 			}
 		}
@@ -392,7 +450,7 @@ Array.prototype.contains = function(elem) {
 			dy: 0,
 		};
 
-		a=0
+		ended = false;
 
 		tunnels = [];
 		walls = [];
@@ -409,7 +467,8 @@ Array.prototype.contains = function(elem) {
 		playing = true;
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
-			generateTunnels(player.x - canvas.width * 2, player.y - canvas.height * 2, player.x + canvas.width * 2, player.y + canvas.height * 2)
+			var numScreens = 5;
+			generateTunnels(player.x - canvas.width * numScreens, player.y - canvas.height * numScreens, player.x + canvas.width * numScreens, player.y + canvas.height * numScreens)
 			while (Date.now() - lastUpdate > 10) {
 				physics();
 				lastUpdate += 10;
