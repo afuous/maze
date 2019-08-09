@@ -505,7 +505,8 @@ Array.prototype.contains = function(elem) {
 
 		for (var i = 0; i < walls.length; i++) {
 			if (collideBallRect({x: player.x, y: player.y, radius: radius}, walls[i])) {
-				stop();
+				player.dx *= -0.1;
+				player.dy *= -0.1;
 				break;
 			}
 		}
