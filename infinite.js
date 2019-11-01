@@ -52,8 +52,22 @@ Array.prototype.contains = function(elem) {
 	window.onkeydown = function(event) {
 		var key = (event || window.event).keyCode;
 		keys[key] = true;
-		if (!playing && controls.restart.contains(key)) {
-			start();
+		if (controls.restart.contains(key)) {
+			var touchingAny = false;
+			for (var i = 0; i < passages.length; i++) {
+				var passage = passages[i];
+				if (collideBallRect({x: player.x, y: player.y, radius: radius}, getRectForPassage(passage))) {
+					touchingAny = true;
+					break;
+				}
+			}
+			if (!touchingAny) {
+				stop();
+				for (var key in keys) {
+					keys[key] = false;
+				}
+				start();
+			}
 		}
 		if (controls.zoom.in == key) {
 			scale += 0.1;
@@ -92,11 +106,8 @@ Array.prototype.contains = function(elem) {
 	var deaccel = 0.1;
 	var friction = 0;
 
-	var time;
 	var playing;
 	var interval;
-
-	var locations;
 
 	var wallThickness = 10;
 	// var tunnelWidth = 100;
@@ -402,7 +413,7 @@ Array.prototype.contains = function(elem) {
 		return fromRefDir(refDir, result);
 	}
 
-	ended = false;
+	var ended;
 	function generateTunnels(minX, minY, maxX, maxY) {
 		var attempts = 0;
 		while (true) {
@@ -473,23 +484,17 @@ Array.prototype.contains = function(elem) {
 			length: 100 + Math.floor(Math.random() * 300),
 		});
 
-		time = 0;
 		playing = true;
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
 			var numScreens = 5;
-			generateTunnels(player.x - canvas.width * numScreens, player.y - canvas.height * numScreens, player.x + canvas.width * numScreens, player.y + canvas.height * numScreens)
+			generateTunnels(player.x - canvas.width * numScreens, player.y - canvas.height * numScreens, player.x + canvas.width * numScreens, player.y + canvas.height * numScreens);
 			while (Date.now() - lastUpdate > 10) {
 				physics();
 				lastUpdate += 10;
-				locations.push({
-					x: player.x,
-					y: player.y,
-				});
 			}
 			draw();
 		}, 1000 / 60);
-		locations = [];
 
 		window.originalCursor = document.body.style.cursor;
 		document.body.style.cursor = "none";
@@ -520,8 +525,6 @@ Array.prototype.contains = function(elem) {
 				break;
 			}
 		}
-
-		if (time > 0 || anyKeyDown("left") || anyKeyDown("right") || anyKeyDown("up") || anyKeyDown("down")) time++;
 	}
 
 	var scale = 1;
