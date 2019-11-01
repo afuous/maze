@@ -34,6 +34,7 @@ Array.prototype.contains = function(elem) {
 		zoom: {
 			in: 187,
 			out: 189,
+			reset: 48,
 		},
 	};
 	function anyKeyDown(dir) {
@@ -74,6 +75,9 @@ Array.prototype.contains = function(elem) {
 		}
 		if (controls.zoom.out == key) {
 			scale = Math.max(0.1, scale - 0.1);
+		}
+		if (controls.zoom.reset == key) {
+			scale = 1;
 		}
 	};
 	window.onkeyup = function(event) {
