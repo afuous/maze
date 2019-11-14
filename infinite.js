@@ -64,8 +64,8 @@ Array.prototype.contains = function(elem) {
 			}
 			if (!touchingAny) {
 				stop();
-				for (var key in keys) {
-					keys[key] = false;
+				for (var k in keys) {
+					keys[k] = false;
 				}
 				start();
 			}
