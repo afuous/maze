@@ -108,6 +108,10 @@ Array.prototype.contains = function(elem) {
 	var radius = 20;
 	var accel = 0.05;
 	var deaccel = 0.1;
+	if (location.search == "?fast") {
+		accel = 0.1;
+		deaccel = 0.3;
+	}
 	var friction = 0;
 
 	var playing;
