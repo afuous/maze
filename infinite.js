@@ -586,8 +586,29 @@ Array.prototype.contains = function(elem) {
 
 		for (var i = 0; i < walls.length; i++) {
 			if (collideBallRect({x: player.x, y: player.y, radius: radius}, walls[i])) {
-				player.dx *= -0.1;
-				player.dy *= -0.1;
+				var wall = walls[i];
+				var bounce = 0.4;
+				// does not work right at corners
+				// collideBallRect should return angle of incidence or something
+				// or might need something more comprehensive
+				// just reimplement collision logic here and handle each case
+				// glitching through corners is kind of fun
+				if (player.x < wall.x) {
+					player.x = wall.x - radius;
+					player.dx *= -bounce;
+				}
+				if (player.x > wall.x + wall.width) {
+					player.x = wall.x + wall.width + radius;
+					player.dx *= -bounce;
+				}
+				if (player.y < wall.y) {
+					player.y = wall.y - radius;
+					player.dy *= -bounce;
+				}
+				if (player.y > wall.y + wall.height) {
+					player.y = wall.y + wall.height + radius;
+					player.dy *= -bounce;
+				}
 				break;
 			}
 		}
