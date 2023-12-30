@@ -63,6 +63,16 @@ dgid("blank").onclick = function() {
 	loadMaze();
 };
 
+dgid("clipboard").onclick = function() {
+	var input = prompt("Paste maze data below", "");
+	try {
+		var json = input.substring(input.indexOf("{"));
+		maze = JSON.parse(json);
+		assignInputs();
+		loadMaze();
+	} catch (e) {}
+};
+
 dgid("jsonp").onclick = function() {
 	prompt("", "loadedMaze=" + JSON.stringify(maze));
 };
@@ -75,21 +85,21 @@ function draw() {
 	canvas.height = maze.height;
 	canvas.style.border = maze.border + "px solid " + maze.color.walls;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	
+
 	ctx.fillStyle = maze.color.walls;
 	for(var i = 0; i < maze.walls.length; i++) {
 		var wall = maze.walls[i];
 		ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
 	}
-	
+
 	ctx.fillStyle = maze.color.end;
 	ctx.fillRect(maze.end.x, maze.end.y, maze.end.width, maze.end.height);
-	
+
 	ctx.fillStyle = maze.color.player;
 	ctx.beginPath();
 	ctx.arc(maze.start.x, maze.start.y, maze.radius, 0, Math.PI * 2);
 	ctx.fill();
-	
+
 	ctx.fillStyle = "black";
 	ctx.textAlign = maze.score.align;
 	ctx.font = maze.score.font + "px Arial";
@@ -97,6 +107,8 @@ function draw() {
 }
 
 function loadMaze() {
+	selected = -1;
+	dgid("selected").style.display = "none";
 	for(var id in inputs) {
 		dgid(id).value = inputs[id][0][inputs[id][1]];
 	}

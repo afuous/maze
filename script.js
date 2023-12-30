@@ -19,15 +19,14 @@ document.getElementById("loadFile").onclick = function() {
 	}
 };
 
-document.getElementById("loadURL").onclick = function() {
-	var url = document.getElementById("url").value;
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = url;
-	document.body.appendChild(script);
-	script.onload = function() {
-		useMaze(loadedMaze);
-	};
+document.getElementById("loadClipboard").onclick = function() {
+	var input = prompt("Paste maze data below", "");
+	try {
+		var json = input.substring(input.indexOf("{"));
+		useMaze(JSON.parse(json));
+	} catch (e) {
+		useMaze(null);
+	}
 };
 
 document.getElementById("loadPrebuilt").onclick = function() {
@@ -117,8 +116,7 @@ function useMaze(maze) {
 			up: [38, "W".charCodeAt(), "K".charCodeAt()],
 			down: [40, "S".charCodeAt(), "J".charCodeAt()]
 		},
-		restartWin: [32], // space
-		restartLose: [32, 16] // space, shift
+		restart: [32], // space
 	};
 	function anyKeyDown(dir) {
 		return controls.movement[dir].some(function(key) {
@@ -140,7 +138,7 @@ function useMaze(maze) {
 	window.onkeydown = function(event) {
 		var key = (event || window.event).keyCode;
 		keys[key] = true;
-		if(!playing && (didWin ? controls.restartWin : controls.restartLose).contains(key)) {
+		if(!playing && controls.restart.contains(key)) {
 			start();
 		}
 	};
@@ -198,7 +196,7 @@ function useMaze(maze) {
 				});
 			}
 			draw();
-		}, 1000 / 60);
+		}, 1000 / 100);
 		locations = [];
 		document.getElementById("showPath").style.visibility = "hidden";
 	}
