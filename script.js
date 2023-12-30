@@ -188,6 +188,7 @@ function useMaze(maze) {
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
 			while (Date.now() - lastUpdate > 10) {
+				runAuto(keys, time);
 				physics();
 				lastUpdate += 10;
 				locations.push({
