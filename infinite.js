@@ -122,6 +122,7 @@ Array.prototype.contains = function(elem) {
 	var tunnelWidth = 150;
 	// var tunnelWidth = 90 + Math.floor(Math.random() * 70);
 	var startOffset = 50;
+	var minTunnelLength = 100;
 
 	var RIGHT = 0;
 	var UP = 1;
@@ -169,6 +170,9 @@ Array.prototype.contains = function(elem) {
 		if ("length" in obj) {
 			// for passages
 			result.length = obj.length;
+		}
+		if ("winding" in obj) {
+			result.winding = obj.winding;
 		}
 		return result;
 	}
@@ -253,9 +257,10 @@ Array.prototype.contains = function(elem) {
 		}
 	}
 
-	function getPassage(refDir, x, y, dir, length) {
+	function getPassage(refDir, winding, x, y, dir, length) {
 		var unRotated = fromRefDir(refDir, { x: x, y: y, dir: dir });
 		unRotated.length = length;
+		unRotated.winding = winding;
 		return unRotated;
 	}
 
@@ -265,33 +270,34 @@ Array.prototype.contains = function(elem) {
 
 	function getPassagesForTunnel(tunnel) {
 		var refDir = tunnel.dir;
+		var winding = tunnel.winding;
 		var rotated = toRefDir(refDir, tunnel);
 		// rotated always has dir RIGHT
 		if (tunnel.type == START) {
 			return [
-				getPassage(refDir, rotated.x - startOffset - wallThickness, rotated.y, RIGHT, tunnel.length + wallThickness),
+				getPassage(refDir, winding, rotated.x - startOffset - wallThickness, rotated.y, RIGHT, tunnel.length + wallThickness),
 			];
 		} else if (tunnel.type == TURN_LEFT) {
 			return [
-				getPassage(refDir, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
-				getPassage(refDir, rotated.x + tunnelWidth / 2, rotated.y + tunnelWidth / 2 + wallThickness, UP, tunnel.length + tunnelWidth + wallThickness * 2),
+				getPassage(refDir, winding, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
+				getPassage(refDir, winding + 1, rotated.x + tunnelWidth / 2, rotated.y + tunnelWidth / 2 + wallThickness, UP, tunnel.length + tunnelWidth + wallThickness * 2),
 			];
 		} else if (tunnel.type == TURN_RIGHT) {
 			return [
-				getPassage(refDir, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
-				getPassage(refDir, rotated.x + tunnelWidth / 2, rotated.y - tunnelWidth / 2 - wallThickness, DOWN, tunnel.length + tunnelWidth + wallThickness * 2),
+				getPassage(refDir, winding, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
+				getPassage(refDir, winding - 1, rotated.x + tunnelWidth / 2, rotated.y - tunnelWidth / 2 - wallThickness, DOWN, tunnel.length + tunnelWidth + wallThickness * 2),
 			];
 		} else if (tunnel.type == U_TURN_LEFT) {
 			return [
-				getPassage(refDir, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
-				getPassage(refDir, rotated.x + tunnelWidth / 2, rotated.y + tunnelWidth / 2 + wallThickness, UP, tunnelWidth * 2 + wallThickness * 2),
-				getPassage(refDir, rotated.x + tunnelWidth + wallThickness, rotated.y - tunnelWidth - wallThickness, LEFT, tunnel.length + tunnelWidth + wallThickness),
+				getPassage(refDir, winding, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
+				getPassage(refDir, winding + 1, rotated.x + tunnelWidth / 2, rotated.y + tunnelWidth / 2 + wallThickness, UP, tunnelWidth * 2 + wallThickness * 2),
+				getPassage(refDir, winding + 2, rotated.x + tunnelWidth + wallThickness, rotated.y - tunnelWidth - wallThickness, LEFT, tunnel.length + tunnelWidth + wallThickness),
 			];
 		} else if (tunnel.type == U_TURN_RIGHT) {
 			return [
-				getPassage(refDir, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
-				getPassage(refDir, rotated.x + tunnelWidth / 2, rotated.y - tunnelWidth / 2 - wallThickness, DOWN, tunnelWidth * 2 + wallThickness * 2),
-				getPassage(refDir, rotated.x + tunnelWidth + wallThickness, rotated.y + tunnelWidth + wallThickness, LEFT, tunnel.length + tunnelWidth + wallThickness),
+				getPassage(refDir, winding, rotated.x, rotated.y, RIGHT, tunnelWidth + wallThickness),
+				getPassage(refDir, winding - 1, rotated.x + tunnelWidth / 2, rotated.y - tunnelWidth / 2 - wallThickness, DOWN, tunnelWidth * 2 + wallThickness * 2),
+				getPassage(refDir, winding - 2, rotated.x + tunnelWidth + wallThickness, rotated.y + tunnelWidth + wallThickness, LEFT, tunnel.length + tunnelWidth + wallThickness),
 			];
 		}
 	}
@@ -334,6 +340,36 @@ Array.prototype.contains = function(elem) {
 		}
 	}
 
+	var NOT_PARALLEL = 0;
+	var LEFT_PARALLEL = 1;
+	var RIGHT_PARALLEL = 2;
+
+	function checkPassageParallel(newPassage, passage) {
+		if (newPassage.dir != passage.dir) {
+			return NOT_PARALLEL;
+		}
+		var refDir = passage.dir;
+		var newRotated = toRefDir(refDir, newPassage);
+		var rotated = toRefDir(refDir, passage);
+		var newRect = getRectForPassage(newRotated);
+		var rect = getRectForPassage(rotated);
+		if (newRect.x + newRect.width + tunnelWidth + wallThickness > rect.x
+			&& newRect.x < rect.x + rect.width + tunnelWidth + wallThickness * 2
+		) {
+			if (newRect.y + newRect.height <= rect.y
+				&& newRect.y + newRect.height + minTunnelLength + tunnelWidth + wallThickness > rect.y
+			) {
+				return LEFT_PARALLEL;
+			}
+			if (newRect.y >= rect.y + rect.height
+				&& newRect.y < rect.y + rect.height + minTunnelLength + tunnelWidth + wallThickness
+			) {
+				return RIGHT_PARALLEL;
+			}
+		}
+		return NOT_PARALLEL;
+	}
+
 	function isTunnelValid(tunnel) {
 		// to check if two tunnels collide, it suffices to check if any of their walls collide
 		// should check for overlapping passages here instead
@@ -346,7 +382,6 @@ Array.prototype.contains = function(elem) {
 			}
 		}
 
-		var newPassages = getPassagesForTunnel(tunnel);
 		var lastNewPassage = newPassages[newPassages.length - 1];
 		var refDir = lastNewPassage.dir;
 		rotated = toRefDir(refDir, lastNewPassage); // always facing right
@@ -361,6 +396,18 @@ Array.prototype.contains = function(elem) {
 				&& rotated.y + tunnelWidth / 2 + wallThickness > rect.y
 			) {
 				return false;
+			}
+		}
+
+		for (var i = 0; i < passages.length; i++) {
+			for (var j = 0; j < newPassages.length; j++) {
+				var parallel = checkPassageParallel(newPassages[j], passages[i]);
+				if (
+					(parallel == LEFT_PARALLEL && newPassages[j].winding > passages[i].winding)
+					|| (parallel == RIGHT_PARALLEL && newPassages[j].winding < passages[i].winding)
+				) {
+					return false;
+				}
 			}
 		}
 
@@ -391,30 +438,35 @@ Array.prototype.contains = function(elem) {
 			result = {
 				x: rotated.x - startOffset + tunnel.length,
 				y: rotated.y,
+				winding: tunnel.winding,
 				dir: RIGHT,
 			};
 		} else if (tunnel.type == TURN_LEFT) {
 			result = {
 				x: rotated.x + tunnelWidth / 2,
 				y: rotated.y - tunnelWidth / 2 - tunnel.length - wallThickness,
+				winding: tunnel.winding + 1,
 				dir: UP,
 			};
 		} else if (tunnel.type == TURN_RIGHT) {
 			result = {
 				x: rotated.x + tunnelWidth / 2,
 				y: rotated.y + tunnelWidth / 2 + tunnel.length + wallThickness,
+				winding: tunnel.winding - 1,
 				dir: DOWN,
 			};
 		} else if (tunnel.type == U_TURN_LEFT) {
 			result = {
 				x: rotated.x - tunnel.length,
 				y: rotated.y - tunnelWidth - wallThickness,
+				winding: tunnel.winding + 2,
 				dir: LEFT,
 			};
 		} else if (tunnel.type == U_TURN_RIGHT) {
 			result = {
 				x: rotated.x - tunnel.length,
 				y: rotated.y + tunnelWidth + wallThickness,
+				winding: tunnel.winding - 2,
 				dir: RIGHT,
 			};
 		}
@@ -427,8 +479,10 @@ Array.prototype.contains = function(elem) {
 		while (true) {
 			attempts++;
 			if (ended || attempts > 1000) {
-				console.log("infinite loop");
-				ended = true;
+				if (!ended) {
+					console.log("infinite loop");
+					ended = true;
+				}
 				break;
 			}
 
@@ -453,7 +507,7 @@ Array.prototype.contains = function(elem) {
 				}
 			}
 
-			var minLength = 100;
+			var minLength = minTunnelLength;
 			var maxLength = 600;
 			var length = Math.floor(minLength + Math.random() * (maxLength - minLength));
 
@@ -464,6 +518,7 @@ Array.prototype.contains = function(elem) {
 				dir: nextState.dir,
 				type: turnType,
 				length: length,
+				winding: nextState.winding,
 			};
 			if (isTunnelValid(tunnel)) {
 				addTunnel(tunnel);
@@ -490,6 +545,7 @@ Array.prototype.contains = function(elem) {
 			dir: Math.floor(Math.random() * 4),
 			type: START,
 			length: 100 + Math.floor(Math.random() * 300),
+			winding: 0,
 		});
 
 		playing = true;
