@@ -384,7 +384,7 @@ Array.prototype.contains = function(elem) {
 
 		var lastNewPassage = newPassages[newPassages.length - 1];
 		var refDir = lastNewPassage.dir;
-		rotated = toRefDir(refDir, lastNewPassage); // always facing right
+		var rotated = toRefDir(refDir, lastNewPassage); // always facing right
 		for (var i = 0; i < passages.length - getPassagesForTunnel(tunnels[tunnels.length - 1]).length; i++) {
 			var otherRotated = toRefDir(refDir, passages[i]);
 			var rect = getRectForPassage(otherRotated);
@@ -400,7 +400,9 @@ Array.prototype.contains = function(elem) {
 		}
 
 		for (var i = 0; i < passages.length; i++) {
-			for (var j = 0; j < newPassages.length; j++) {
+			// starting at 1 since we should not check the first passage, which overlaps with the previous passage
+			// should find a better way to handle this
+			for (var j = 1; j < newPassages.length; j++) {
 				var parallel = checkPassageParallel(newPassages[j], passages[i]);
 				if (
 					(parallel == LEFT_PARALLEL && newPassages[j].winding > passages[i].winding)
