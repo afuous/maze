@@ -218,11 +218,23 @@ function useMaze(maze) {
 		drawTime();
 	};
 
+	function getNextDx() {
+		var nextDx = dx;
+		if(anyKeyDown("left")) nextDx -= nextDx < 0 ? accel : deaccel;
+		if(anyKeyDown("right")) nextDx += nextDx > 0 ? accel : deaccel;
+		return nextDx;
+	}
+
+	function getNextDy() {
+		var nextDy = dy;
+		if(anyKeyDown("up")) nextDy -= nextDy < 0 ? accel : deaccel;
+		if(anyKeyDown("down")) nextDy += nextDy > 0 ? accel : deaccel;
+		return nextDy;
+	}
+
 	function physics() {
-		if(anyKeyDown("left")) dx -= dx < 0 ? accel : deaccel;
-		if(anyKeyDown("right")) dx += dx > 0 ? accel : deaccel;
-		if(anyKeyDown("up")) dy -= dy < 0 ? accel : deaccel;
-		if(anyKeyDown("down")) dy += dy > 0 ? accel : deaccel;
+		dx = getNextDx();
+		dy = getNextDy();
 		x += dx;
 		y += dy;
 		if(x < radius) {
@@ -288,7 +300,7 @@ function useMaze(maze) {
 
 	function draw(fraction) {
 		drawBoard();
-		drawPlayer(x + dx * fraction, y + dy * fraction);
+		drawPlayer(x + getNextDx() * fraction, y + getNextDy() * fraction);
 		drawTime();
 	}
 }
