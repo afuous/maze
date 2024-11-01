@@ -195,8 +195,8 @@ function useMaze(maze) {
 					y: y,
 				});
 			}
-			draw();
-		}, 1000 / 100);
+			draw(playing ? (Date.now() - lastUpdate) / 10 : 0);
+		}, 1000 / 120);
 		locations = [];
 		document.getElementById("showPath").style.visibility = "hidden";
 	}
@@ -286,9 +286,9 @@ function useMaze(maze) {
 		ctx.fillText((time / 100).toFixed(2).toString(), maze.score.x, maze.score.y);
 	}
 
-	function draw() {
+	function draw(fraction) {
 		drawBoard();
-		drawPlayer(x, y);
+		drawPlayer(x + dx * fraction, y + dy * fraction);
 		drawTime();
 	}
 }
