@@ -187,7 +187,7 @@ function useMaze(maze) {
 		playing = true;
 		var lastUpdate = Date.now();
 		interval = setInterval(function() {
-			while (Date.now() - lastUpdate > 10) {
+			while (playing && Date.now() - lastUpdate > 10) {
 				runAuto(keys, time);
 				physics();
 				lastUpdate += 10;
@@ -196,8 +196,8 @@ function useMaze(maze) {
 					y: y,
 				});
 			}
-			draw();
-		}, 1000 / 100);
+			draw(playing ? (Date.now() - lastUpdate) / 10 : 0);
+		}, 1000 / 120);
 		locations = [];
 		document.getElementById("showPath").style.visibility = "hidden";
 	}
@@ -219,11 +219,23 @@ function useMaze(maze) {
 		drawTime();
 	};
 
+	function getNextDx() {
+		var nextDx = dx;
+		if(anyKeyDown("left")) nextDx -= nextDx < 0 ? accel : deaccel;
+		if(anyKeyDown("right")) nextDx += nextDx > 0 ? accel : deaccel;
+		return nextDx;
+	}
+
+	function getNextDy() {
+		var nextDy = dy;
+		if(anyKeyDown("up")) nextDy -= nextDy < 0 ? accel : deaccel;
+		if(anyKeyDown("down")) nextDy += nextDy > 0 ? accel : deaccel;
+		return nextDy;
+	}
+
 	function physics() {
-		if(anyKeyDown("left")) dx -= dx < 0 ? accel : deaccel;
-		if(anyKeyDown("right")) dx += dx > 0 ? accel : deaccel;
-		if(anyKeyDown("up")) dy -= dy < 0 ? accel : deaccel;
-		if(anyKeyDown("down")) dy += dy > 0 ? accel : deaccel;
+		dx = getNextDx();
+		dy = getNextDy();
 		x += dx;
 		y += dy;
 		if(x < radius) {
@@ -287,9 +299,9 @@ function useMaze(maze) {
 		ctx.fillText((time / 100).toFixed(2).toString(), maze.score.x, maze.score.y);
 	}
 
-	function draw() {
+	function draw(fraction) {
 		drawBoard();
-		drawPlayer(x, y);
+		drawPlayer(x + getNextDx() * fraction, y + getNextDy() * fraction);
 		drawTime();
 	}
 }
